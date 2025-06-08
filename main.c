@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
+#include <string.h>
 
 struct termios org_termios;
 
@@ -12,7 +13,6 @@ void dis_raw()
 
 void en_raw()
 {
-        printf("Enabled raw lol");
         tcgetattr(STDIN_FILENO, &org_termios);
         atexit(dis_raw);
         struct termios raw = org_termios;
@@ -24,7 +24,10 @@ typedef struct {
     int x;
     int y;
 } Player;
-
+void cls()
+{
+	printf("\033[2J\033[H");
+}
 void loop(Player player);
 void map(int px, int py, int width, int height);
 void command();
@@ -42,10 +45,9 @@ int main()
         {
                 char c;
                 ssize_t n = read(STDIN_FILENO, &c, 1);
-        printf("\033[2J\033[H");
-
                 if (n == -1) continue;
 
+		cls();
                 if (c == 'q')
                 {
                         break;
@@ -109,10 +111,25 @@ void command()
 {
 	dis_raw();
 	char input[100];
-	scanf("%s", input);
-	printf("%s\n", input);
+
+	printf(":");
+	fflush(stdout);
+	if (fgets(input, sizeof(input), stdin) != NULL)
+	{
+		input[strcspn(input, "\n")] = '\0';
+		if (strcmp(input, "help") != 0)
+		{
+			printf("This is help command\n");
+		} else
+		{
+			printf("Your command is: %s\n", input);
+		}
+	}
+
 	printf("press enter to continute...");
-	scanf("");
+
+	while (getchar() != '\n');
+	cls();
 	en_raw();
 }
 
