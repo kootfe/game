@@ -117,7 +117,7 @@ void command()
 	if (fgets(input, sizeof(input), stdin) != NULL)
 	{
 		input[strcspn(input, "\n")] = '\0';
-		if (strcmp(input, "help") != 0)
+		if (strcmp(input, "help") == 0)
 		{
 			printf("This is help command\n");
 		} else
