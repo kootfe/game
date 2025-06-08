@@ -26,7 +26,8 @@ typedef struct {
 } Player;
 
 void loop(Player player);
-
+void map(int px, int py, int width, int height);
+void command();
 int main()
 {
     printf("\033[2J\033[H");
@@ -53,8 +54,20 @@ int main()
                 switch (c)
                 {
                         case 'a':
-                player.x -= 1;
-                break;
+		                player.x -= 1;
+               			break;
+			case 's':
+				player.y += 1;
+				break;
+			case 'd':
+				player.x += 1;
+				break;
+			case 'w':
+				player.y -= 1;
+				break;
+			case ':':
+				command();
+				break;
                         default:
                                 printf("Key: %c\n", c);
                 }
@@ -66,4 +79,40 @@ int main()
 void loop(Player player)
 {
     printf("\rX: %d Y: %d\n", player.x, player.y);
+    map(player.x, player.y, 20, 20);
 }
+
+void map(int px, int py, int width, int height)
+{
+    for(int h = 0; h < height; h++)
+    {
+        for(int w = 0; w < width; w++)
+        {
+            if(h == 0 || h == height - 1 || w == 0 || w == width - 1)
+            {
+                printf("# ");
+            }
+            else if (w == px && h == py)
+            {
+                printf("@ ");
+            }
+            else
+            {
+                printf(". ");
+            }
+        }
+        printf("\n"); // Newline after each row, NOT after each tile
+    }
+}
+
+void command()
+{
+	dis_raw();
+	char input[100];
+	scanf("%s", input);
+	printf("%s\n", input);
+	printf("press enter to continute...");
+	scanf("");
+	en_raw();
+}
+
