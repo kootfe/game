@@ -3,6 +3,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <string.h>
+#include <time.h>
 
 #define BUFF_LEAK 99
 
@@ -26,6 +27,11 @@ typedef struct {
     int x;
     int y;
 } Player;
+
+typedef struct {
+    int x;
+    int y;
+} Enemy;
 
 typedef struct {
     int width;
@@ -109,9 +115,11 @@ void cls()
 }
 
 Player player = { 5, 5 };
+Enemy enemy = { 10, 10 };
 void loop();
 void map_gen(int px, int py);
 void command();
+void mv_en();
 
 int main()
 {
@@ -161,10 +169,29 @@ int main()
 //void loop(Player player)
 void loop()
 {
+    mv_en(); // move enemy first
+
+    if (enemy.x == player.x && enemy.y == player.y)
+    {
+        cls();
+        map_gen(player.x, player.y); // show the final map
+        printf("\nGame Over\n");
+        sleep(2); // short delay to show game over
+        exit(0);
+    }
+
+    cls();
     printf("\rX: %d Y: %d\n", player.x, player.y);
+    printf("EX: %d EY: %d\n", enemy.x, enemy.y);
     map_gen(player.x, player.y);
 }
 
+void mv_en()
+{
+    srand(time(NULL));
+    int res1 = rand() % 2;
+    int res2 = (rand() % 100) < 25 ? 1 : 0;
+}
 void map_gen(int px, int py)
 {
     for(int h = 0; h <= map. height; h++)
@@ -178,6 +205,8 @@ void map_gen(int px, int py)
             else if (w == px && h == py)
             {
                 printf("@ ");
+            } else if (w == enemy.x && h == enemy.y) {
+                printf("E ");
             }
             else
             {
