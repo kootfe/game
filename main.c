@@ -1,42 +1,20 @@
-#include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
 #include <string.h>
 
+#define BUFF_LEAK 99
+
 struct termios org_termios;
 
-typedef enum {
-    TILE_FLOOR,
-    TILE_WALL,
-    PLAYER,
-    ENEMY,
-} Tile;
-
-typedef struct {
-    int x;
-    int y;
-} Player;
-
-typedef struct {
-    int x;
-    int y;
-} Ememy;
-
-typedef struct {
-    int width;
-    int height;
-    Tile **tiles; 
-} MapV1;
-
-MapV1 map;
-
-void dis_raw() {
+void dis_raw()
+{
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &org_termios);
 }
 
-void en_raw() {
+void en_raw()
+{
     tcgetattr(STDIN_FILENO, &org_termios);
     atexit(dis_raw);
     struct termios raw = org_termios;
@@ -44,133 +22,199 @@ void en_raw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
 
-void cls() {
+typedef struct {
+    int x;
+    int y;
+} Player;
+
+typedef struct {
+    int width;
+    int height;
+} MapV1;
+
+MapV1 map = { 20, 20 };
+
+int str_calt(const char *str, const char target)
+{
+    int ret = 1;
+    while (*str)
+    {
+        if (*str == target)
+        {
+            ret++;
+        }
+    str++;
+    }
+    return ret;
+}
+
+//NOTE USE THAT AS COMMADN PARSER IN command() FUNCTION!!!!!
+char **split(const char *str, const char target, int *err)
+{
+    int len = str_calt(str, target);
+    char **arr = malloc(sizeof(char*) * (len + 1));
+    int i = 0;
+    char buff[255];
+    int pos = 0;
+    while (*str)
+    {
+        if (*str == target)
+        {
+            buff[i] = '\0';
+            i = 0;
+            arr[pos++] = strdup(buff);
+        } else {
+            buff[i++] = *str;
+            if (i == 253) {
+                *err = BUFF_LEAK;
+               for (int j = 0; j < pos; j++)
+                {
+                    free(arr[j]);
+                }
+               free(arr);
+                return NULL; //just fuck you im out sign lol
+            }
+        }
+        str++;
+    }
+
+    if (i > 0)
+    {
+        buff[i] = '\0';
+        arr[pos++] = strdup(buff);
+    }
+
+    arr[pos] = NULL;
+    *err = 0;
+    return arr;
+}
+
+void freecmd(char **arr)
+{
+    int i = 0;
+    while (1)
+    {
+        if (arr[i] != NULL) {
+            free(arr[i++]);
+        } else {
+            break;
+        }
+    }
+    free(arr);
+}
+
+void cls()
+{
     printf("\033[2J\033[H");
 }
 
-void init_map(int width, int height) {
-    map.width = width;
-    map.height = height;
-    map.tiles = malloc(height * sizeof(Tile *));
-    if (!map.tiles) {
-        perror("malloc");
-        exit(1);
-    }
-    for (int i = 0; i < height; i++) {
-        map.tiles[i] = malloc(width * sizeof(Tile));
-        if (!map.tiles[i]) {
-            perror("malloc");
-            exit(1);
-        }
-    }
-
-    // Fill map with floor and walls on borders
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            if (y == 0 || y == height -1 || x == 0 || x == width -1) {
-                map.tiles[y][x] = TILE_WALL;
-            } else {
-                map.tiles[y][x] = TILE_FLOOR;
-            }
-        }
-    }
-}
-
-void free_map() {
-    for (int i = 0; i < map.height; i++) {
-        free(map.tiles[i]);
-    }
-    free(map.tiles);
-}
-
-void map_gen(Player player) {
-    for (int y = 0; y < map.height; y++) {
-        for (int x = 0; x < map.width; x++) {
-            if (player.x == x && player.y == y) {
-                printf("@ ");
-            } else {
-                switch (map.tiles[y][x]) {
-                    case TILE_FLOOR: printf(". "); break;
-                    case TILE_WALL: printf("# "); break;
-                    case ENEMY: printf("E "); break;
-                    default: printf("? "); break;
-                }
-            }
-        }
-        printf("\n");
-    }
-}
-
+Player player = { 5, 5 };
+void loop();
+void map_gen(int px, int py);
 void command();
 
-void loop(Player *player) {
-    printf("X: %d Y: %d\n", player->x, player->y);
-    map_gen(*player);
-}
-
-int main() {
+int main()
+{
+    printf("\033[2J\033[H");
     en_raw();
-    cls();
-    init_map(20, 20);
 
-    Player player = {5,5};
-
-    loop(&player);
-
-    while (1) {
+ //   loop(player);
+    loop();
+    while (1)
+    {
         char c;
         ssize_t n = read(STDIN_FILENO, &c, 1);
         if (n == -1) continue;
 
         cls();
-        if (c == 'q') break;
+        if (c == 'q')
+        {
+            break;
+        }
 
-        switch (c) {
+        switch (c)
+        {
             case 'a':
-                if (player.x > 1 && map.tiles[player.y][player.x - 1] != TILE_WALL) player.x--;
-                break;
-            case 'd':
-                if (player.x < map.width - 2 && map.tiles[player.y][player.x + 1] != TILE_WALL) player.x++;
-                break;
-            case 'w':
-                if (player.y > 1 && map.tiles[player.y - 1][player.x] != TILE_WALL) player.y--;
+                if (player.x != 1) player.x -= 1;
                 break;
             case 's':
-                if (player.y < map.height - 2 && map.tiles[player.y + 1][player.x] != TILE_WALL) player.y++;
+                if (player.y != map.height-1) player.y += 1;
+                break;
+            case 'd':
+                if (player.x != map.width-1) player.x += 1;
+                break;
+            case 'w':
+                if (player.y != 1) player.y -= 1;
                 break;
             case ':':
                 command();
                 break;
             default:
                 printf("Key: %c\n", c);
-                break;
         }
-        loop(&player);
-    }
 
-    free_map();
-    dis_raw();
-    return 0;
+        loop();
+    }
+    return  0;
 }
 
-void command() {
-    dis_raw();
-    char input[100];
+//void loop(Player player)
+void loop()
+{
+    printf("\rX: %d Y: %d\n", player.x, player.y);
+    map_gen(player.x, player.y);
+}
 
+void map_gen(int px, int py)
+{
+    for(int h = 0; h <= map. height; h++)
+    {
+        for(int w = 0; w <= map.width; w++)
+        {
+            if(h == 0 || h == map.height || w == 0 || w == map.width)
+            {
+                printf("# ");
+            }
+            else if (w == px && h == py)
+            {
+                printf("@ ");
+            }
+            else
+            {
+                printf(". ");
+            }
+        }
+        printf("\n");
+    }
+}
+
+void command()
+{
+    dis_raw();
+    char input[1024];
+    char **arr = NULL;
+    int err;
     printf(":");
     fflush(stdout);
-    if (fgets(input, sizeof(input), stdin) != NULL) {
+    if (fgets(input, sizeof(input), stdin) != NULL)
+    {
         input[strcspn(input, "\n")] = '\0';
-        if (strcmp(input, "help") == 0) {
-            printf("This is help command\n");
-        } else if (strcmp("q", input) == 0) {
-            exit(0);
-        } else {
-            printf("Your command is: %s\n", input);
-        }
+        arr = split(input, ' ', &err);
+        //printf("Command: %s\n", input);
     }
 
-    printf("press enter to continue...");
+    if (strcmp("setp", arr[0]) == 0)
+    {
+        if (arr[1] == NULL || arr[2] == NULL) exit(-1);
+        player.x = atoi(arr[1]);
+        player.y = atoi(arr[2]); //not my probllem if they can use it...
+    } else if (strcmp("help", arr[0]) == 0)
+    {
+        printf("Read The Fucking Manual\n");
+    }
+    freecmd(arr);
+    printf("press enter to continute...");
+
     while (getchar() != '\n');
     cls();
     en_raw();
