@@ -9,6 +9,44 @@
 
 struct termios org_termios;
 
+typedef struct {
+    int id;
+    char* value;
+} KeyPairElement;
+
+typedef struct {
+    KeyPairElement *data;
+    int size;
+    int inital; //i probaly should only remove that and set initial size to 0 but fuck it who cares :)
+} HashMap;
+
+void freeMap(HashMap *map)
+{
+    free(map->data->value);
+    free(map->data);
+    free(map); //im sure i didnt make this as pointer but...
+}
+
+HashMap createMap()
+{
+    KeyPairElement *data = malloc(sizeof(KeyPairElement) * 1);
+    HashMap map = {data, 1, 1};
+    return map;
+}
+
+void addElementToMap(HashMap *map, KeyPairElement element)
+{
+    if (map->inital)
+    {
+        map->data[0] = element;
+        map->inital = 0;
+    } else {
+        map->size++;
+        map->data = realloc(map->data, sizeof(KeyPairElement) * map->size);
+        map->data[map->size-1] = element;
+    }
+}
+
 void dis_raw()
 {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &org_termios);
@@ -54,7 +92,6 @@ int str_calt(const char *str, const char target)
     return ret;
 }
 
-//NOTE USE THAT AS COMMADN PARSER IN command() FUNCTION!!!!!
 char **split(const char *str, const char target, int *err)
 {
     int len = str_calt(str, target);
@@ -125,6 +162,7 @@ int main()
 {
     printf("\033[2J\033[H");
     en_raw();
+    srand(time(NULL));
 
  //   loop(player);
     loop();
@@ -188,9 +226,25 @@ void loop()
 
 void mv_en()
 {
-    srand(time(NULL));
     int res1 = rand() % 2;
-    int res2 = (rand() % 100) < 25 ? 1 : 0;
+    int res2 = (rand() % 100) < 25 ? 0 : 1;
+    if (res1) {
+        if (res2) {
+            if (player.x < enemy.x) {
+                enemy.x--;
+            } else {
+                enemy.x++;
+            }
+        }
+    } else {
+        if (res2) {
+            if (player.y < enemy.y) {
+                enemy.y--;
+            } else {
+                enemy.y++;
+            }
+        }
+    }
 }
 void map_gen(int px, int py)
 {
