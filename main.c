@@ -20,6 +20,16 @@ typedef struct {
     int inital; //i probaly should only remove that and set initial size to 0 but fuck it who cares :)
 } HashMap;
 
+//void freeMap(HashMap *map)
+//{
+//    for (unsigned int x = 0; x < map->size; i++)
+//    {
+//        free(map->data[x]->value);
+//    }
+//    free(map->data);
+//}
+//Thats probaly how i fix it but i have 0 idea how can i fix it 
+
 void freeMap(HashMap *map)
 {
     free(map->data->value);
@@ -62,8 +72,15 @@ void en_raw()
 }
 
 typedef struct {
+    int maxStack;
+    int id;
+    char* name;
+} Item;
+
+typedef struct {
     int x;
     int y;
+    Item testItemTemp;
 } Player;
 
 typedef struct {
@@ -151,7 +168,7 @@ void cls()
     printf("\033[2J\033[H");
 }
 
-Player player = { 5, 5 };
+Player player = { 5, 5, {4, 2, "Test"} };
 Enemy enemy = { 10, 10 };
 void loop();
 void map_gen(int px, int py);
@@ -222,6 +239,7 @@ void loop()
     printf("\rX: %d Y: %d\n", player.x, player.y);
     printf("EX: %d EY: %d\n", enemy.x, enemy.y);
     map_gen(player.x, player.y);
+    printf("\nItem: %s, maxStack: %d, id; %d\n", player.testItemTemp.name, player.testItemTemp.maxStack, player.testItemTemp.id);
 }
 
 void mv_en()
