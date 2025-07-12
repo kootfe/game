@@ -1,0 +1,3 @@
+main main.c
+out test
+!-Wall -Wextra
