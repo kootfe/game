@@ -1,3 +1,12 @@
 main main.c
 out test
+./includess i
+extra ./includes/errors.c
+extra ./includes/tetmin.c
+extra ./includes/player.c
+extra ./includes/kstring.c
+extra ./includes/command.c
+extra ./includes/map.c
+extra ./includes/utils.c
+extra ./includes/enemy.c
 !-Wall -Wextra
