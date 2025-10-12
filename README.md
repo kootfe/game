@@ -5,36 +5,36 @@ Hello im `Koofte`. This project is for me to lern things and actualy do them
 ![Static Badge](https://img.shields.io/badge/This%20Is%20NOT%20An%20Actoual%20Game-FF0000?style=flat)
 
 ## Fallow Path
-[x] Basic Map  
-[x] Movment  
-[ ] Items  
-[ ] Primative Map  
-[ ] Advenced Map  
-[ ] Building  
-[ ] Multiplayer over tcp  
-[ ] Multiplayer over udp  
-[ ] Error Handleing  
-[ ] In Game Chat  
-[ ] In Game Forum  
-[x] Memory Managment  
-[ ] FINISH  
+- [x] Basic Map  
+- [x] Movment  
+- [ ] Items  
+- [ ] Primative Map  
+- [ ] Advenced Map  
+- [ ] Building  
+- [ ] Multiplayer over tcp  
+- [ ] Multiplayer over udp  
+- [ ] Error Handleing  
+- [ ] In Game Chat  
+- [ ] In Game Forum  
+- [x] Memory Managment  
+- [ ] FINISH  
 
 ### Optional Fallow Path
-[ ] Trade System  
-[ ] Web Site For Game  
-[ ] Actual Acount System over mail and pass  
-[ ] A main server for public play  
-[ ] A opengl prot of the game  
-[ ] A web version of the gaem  
-[ ] Events  
-[ ] Alt charachters  
-[ ] Guilds  
-[ ] Bosses  
-[ ] Weaponsmithing  
-[ ] Resource Gethering  
-[ ] Quests  
-[ ] NPCs  
-[ ] Bazaar  
+- [ ] Trade System  
+- [ ] Web Site For Game  
+- [ ] Actual Acount System over mail and pass  
+- [ ] A main server for public play  
+- [ ] A opengl prot of the game  
+- [ ] A web version of the gaem  
+- [ ] Events  
+- [ ] Alt charachters  
+- [ ] Guilds  
+- [ ] Bosses  
+- [ ] Weaponsmithing  
+- [ ] Resource Gethering  
+- [ ] Quests  
+- [ ] NPCs  
+- [ ] Bazaar  
 > **NOTE:** *Unlike Normal Fallow Path this does not go up to bottom this list can be compalted randomly or never be added*
 
 ## ToolChain
@@ -77,5 +77,5 @@ Made by
 - Minecraft: Kooftea
 - Youtube: @koofte_
 - Reddit: u/Kootfe
-- Web: http://www.kooftea.com.tr (depreaced)
+- Web: http://kootfe.github.io
 
